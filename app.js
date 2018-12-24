@@ -25,4 +25,15 @@ app.post("/quotes", (req, res) => {
   );
 });
 
+app.get("/quotes", (req, res) => {
+  Quote.find().then(
+    quotes => {
+      res.send({ quotes });
+    },
+    err => {
+      res.status(400).send(err);
+    }
+  );
+});
+
 module.exports = app;
