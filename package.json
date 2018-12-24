@@ -7,11 +7,15 @@
     "test": "jest",
     "start": "node server.js"
   },
+  "engines": {
+    "node": "v10.9.0"
+  },
   "author": "mkiterian",
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
+    "mongodb": "^3.1.10",
     "mongoose": "^5.4.0"
   },
   "devDependencies": {
