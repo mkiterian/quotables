@@ -91,4 +91,32 @@ describe("DELETE /quotes/:id", () => {
     const newResponse = await request(app).get("/quotes");
     expect(newResponse.body.quotes.length).toBe(testQuotes.length - 1);
   });
+
+  test("should return a 404 if id is not found", async () => {
+    const allTestQuotes = await request(app).get("/quotes");
+    const id = "123";
+    const response = await request(app).delete(`/quotes/${id}`);
+    expect(response.statusCode).toBe(404);
+    expect(response.body.message).toBe("not found");
+  });
+});
+
+describe("PATCH /quotes/:id", () => {
+  test("should update a quote with a given id", async () => {
+    const updateText = "This is an update";
+    const allTestQuotes = await request(app).get("/quotes");
+    const id = allTestQuotes.body.quotes[0]._id;
+    const response = await request(app).patch(`/quotes/${id}`).send({
+      text: updateText
+    });
+    expect(response.statusCode).toBe(200);
+    expect(response.body.quote.text).toBe(updateText);
+  });
+
+  test("should return a 404 if id is not found", async () => {
+    const id = "123";
+    const response = await request(app).patch(`/quotes/${id}`);
+    expect(response.statusCode).toBe(404);
+    expect(response.body.message).toBe("not found");
+  });
 });

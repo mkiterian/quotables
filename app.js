@@ -1,5 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+require("./config/config");
 
 const mongoose = require("./db/mongoose");
 const { ObjectID } = require("mongodb");
@@ -38,7 +39,7 @@ app.get("/quotes", (req, res) => {
 });
 
 app.get("/quotes/:id", (req, res) => {
-  id = req.params.id;
+  const id = req.params.id;
   if (!ObjectID.isValid(id)) {
     return res.status(404).send({
       message: "not found"
@@ -60,7 +61,7 @@ app.get("/quotes/:id", (req, res) => {
 });
 
 app.delete("/quotes/:id", (req, res) => {
-  id = req.params.id;
+  const id = req.params.id;
   if (!ObjectID.isValid(id)) {
     return res.status(404).send({
       message: "not found"
@@ -79,6 +80,32 @@ app.delete("/quotes/:id", (req, res) => {
       return res.status(404).send({});
     }
   );
+});
+
+app.patch("/quotes/:id", (req, res) => {
+  const id = req.params.id;
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send({
+      message: "not found"
+    });
+  }
+  const { text, author, year } = req.body;
+
+  Quote.findByIdAndUpdate(
+    id,
+    {
+      $set: {
+        author,
+        text,
+        year
+      }
+    },
+    { new: true }
+  )
+    .then(quote => {
+      return res.send({ quote });
+    })
+    .catch(err => res.status(400).send());
 });
 
 module.exports = app;
