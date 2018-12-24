@@ -108,4 +108,21 @@ app.patch("/quotes/:id", (req, res) => {
     .catch(err => res.status(400).send());
 });
 
+app.post("/users", (req, res) => {
+  const { email, password } = req.body;
+  const newUser = new User({ email, password });
+  newUser
+    .save()
+    .then(user => {
+      return user.generateAuthToken();
+    })
+    .then(token => {
+      // fix this
+      res.header("x-auth", token).send(newUser);
+    })
+    .catch(err => {
+      res.status(400).send({ error: err });
+    });
+});
+
 module.exports = app;
