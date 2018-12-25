@@ -1,5 +1,6 @@
 const request = require("supertest");
 const mongoose = require("mongoose");
+const { User } = require("../models/user");
 const app = require("../app");
 const {
   testQuote,
@@ -144,5 +145,40 @@ describe("POST /users", () => {
       .post("/users")
       .send({ email, password });
     expect(response.statusCode).toBe(400);
+  });
+});
+
+describe("POST /users/login", () => {
+  it("should login user and return auth token", async () => {
+    const response = await request(app)
+      .post("/users/login")
+      .send({
+        email: testUsers[0].email,
+        password: testUsers[0].password
+      });
+    expect(response.headers["x-auth"]).toBeTruthy();
+    expect(response.body.user.email).toBe(testUsers[0].email);
+  });
+
+  it("should fail login", async () => {
+    const response = await request(app)
+      .post("/users/login")
+      .send({
+        email: testUsers[0].email,
+        password: "wrong"
+      });
+    expect(response.statusCode).toBe(400);
+    expect(response.headers["x-auth"]).toBeFalsy();
+  });
+});
+
+describe("DELETE /users/logout", () => {
+  it("should logout user successfully", async () => {
+    const response = await request(app)
+      .delete("/users/logout")
+      .set("x-auth", testUsers[0].tokens[0].token);
+    expect(response.statusCode).toBe(200);
+    const result = await User.findById(testUsers[0]);
+    expect(result.tokens.length).toBe(0);
   });
 });

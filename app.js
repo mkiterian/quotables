@@ -133,11 +133,23 @@ app.post("/users/login", (req, res) => {
   const { email, password } = req.body;
   User.findByCredentials(email, password)
     .then(user => {
+      if (user.tokens[0].token) {
+        return res.header("x-auth", user.tokens[0].token).send({ user });
+      }
       user.generateAuthToken().then(token => {
         res.header("x-auth", token).send({ user });
       });
     })
-    .catch(err => res.status(401).send());
+    .catch(err => res.status(400).send());
+});
+
+app.delete("/users/logout", authenticate, (req, res) => {
+  req.user
+    .deleteToken(req.token)
+    .then(() => {
+      res.status(200).send();
+    })
+    .catch(err => res.status.send(400));
 });
 
 module.exports = app;

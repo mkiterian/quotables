@@ -89,6 +89,10 @@ UserSchema.methods.generateAuthToken = function() {
   return this.save().then(() => token);
 };
 
+UserSchema.methods.deleteToken = function(token) {
+  return this.update({ $pull: { tokens: { token } } });
+};
+
 const User = mongoose.model("User", UserSchema);
 
 module.exports = { User };
