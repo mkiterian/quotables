@@ -1,37 +1,16 @@
 const request = require("supertest");
 const mongoose = require("mongoose");
-const { Quote } = require("../models/quote");
 const app = require("../app");
+const {
+  testQuote,
+  testQuotes,
+  seedQuotes,
+  testUsers,
+  seedUsers
+} = require("./seed/seed");
 
-const testQuote = {
-  text: "This is a test quote",
-  year: 2000
-};
-
-const testQuotes = [
-  {
-    text: "test quote 1"
-  },
-  {
-    text: "test quote 2",
-    author: "testAuthor1"
-  },
-  {
-    text: "test quote 3",
-    author: "testAuthor3",
-    year: 2018
-  }
-];
-
-beforeEach(done => {
-  Quote.deleteMany({})
-    .then(() => {
-      return Quote.insertMany(testQuotes);
-    })
-    .then(() => {
-      return done();
-    });
-});
+beforeEach(seedUsers);
+beforeEach(seedQuotes);
 
 afterAll(done => {
   mongoose.disconnect(done);
@@ -106,9 +85,11 @@ describe("PATCH /quotes/:id", () => {
     const updateText = "This is an update";
     const allTestQuotes = await request(app).get("/quotes");
     const id = allTestQuotes.body.quotes[0]._id;
-    const response = await request(app).patch(`/quotes/${id}`).send({
-      text: updateText
-    });
+    const response = await request(app)
+      .patch(`/quotes/${id}`)
+      .send({
+        text: updateText
+      });
     expect(response.statusCode).toBe(200);
     expect(response.body.quote.text).toBe(updateText);
   });
@@ -118,5 +99,50 @@ describe("PATCH /quotes/:id", () => {
     const response = await request(app).patch(`/quotes/${id}`);
     expect(response.statusCode).toBe(404);
     expect(response.body.message).toBe("not found");
+  });
+});
+
+describe("GET /users/me", () => {
+  it("should return a user if authenticated", async () => {
+    const response = await request(app)
+      .get("/users/me")
+      .set("x-auth", testUsers[0].tokens[0].token);
+    expect(response.statusCode).toBe(200);
+    expect(response.body.user.email).toBe(testUsers[0].email);
+    expect(response.body.user._id).toBe(testUsers[0]._id.toString());
+  });
+
+  it("should return a 401 if not authenticated", async () => {
+    const response = await request(app).get("/users/me");
+    expect(response.statusCode).toBe(401);
+  });
+});
+
+describe("POST /users", () => {
+  it("shoud create a user", async () => {
+    const email = "qwerty@email.com";
+    const password = "qwertyuiop";
+    const response = await request(app)
+      .post("/users")
+      .send({ email, password });
+    expect(response.statusCode).toBe(200);
+    expect(response.body.email).toBe(email);
+    expect(response.headers["x-auth"]).not.toBeUndefined();
+  });
+  it("should return validation errors if request is invalid", async () => {
+    const email = "email.com";
+    const password = "qwertyuiop";
+    const response = await request(app)
+      .post("/users")
+      .send({ email, password });
+    expect(response.statusCode).toBe(400);
+  });
+  it("should not create user if the email is in use", async () => {
+    const email = testUsers[0].email;
+    const password = "qwertyuiop";
+    const response = await request(app)
+      .post("/users")
+      .send({ email, password });
+    expect(response.statusCode).toBe(400);
   });
 });

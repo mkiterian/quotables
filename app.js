@@ -118,7 +118,6 @@ app.post("/users", (req, res) => {
       return user.generateAuthToken();
     })
     .then(token => {
-      // fix this
       res.header("x-auth", token).send(newUser);
     })
     .catch(err => {
@@ -127,7 +126,18 @@ app.post("/users", (req, res) => {
 });
 
 app.get("/users/me", authenticate, (req, res) => {
-  res.send(req.user);
+  res.send({ user: req.user });
+});
+
+app.post("/users/login", (req, res) => {
+  const { email, password } = req.body;
+  User.findByCredentials(email, password)
+    .then(user => {
+      user.generateAuthToken().then(token => {
+        res.header("x-auth", token).send({ user });
+      });
+    })
+    .catch(err => res.status(401).send());
 });
 
 module.exports = app;
