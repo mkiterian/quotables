@@ -6,6 +6,7 @@ const mongoose = require("./db/mongoose");
 const { ObjectID } = require("mongodb");
 const { User } = require("./models/user");
 const { Quote } = require("./models/quote");
+const { authenticate } = require("./middleware/auth");
 const app = express();
 app.use(bodyParser.json());
 
@@ -123,6 +124,10 @@ app.post("/users", (req, res) => {
     .catch(err => {
       res.status(400).send({ error: err });
     });
+});
+
+app.get("/users/me", authenticate, (req, res) => {
+  res.send(req.user);
 });
 
 module.exports = app;

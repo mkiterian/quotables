@@ -27,6 +27,21 @@ const UserSchema = new mongoose.Schema({
   ]
 });
 
+UserSchema.statics.findByToken = function(token) {
+  let decoded = null;
+  try {
+    decoded = jwt.verify(token, "secret123");
+  } catch (err) {
+    return Promise.reject();
+  }
+
+  return this.findOne({
+    _id: decoded._id,
+    "tokens.token": token,
+    "tokens.access": "auth"
+  });
+};
+
 UserSchema.methods.toJSON = function() {
   userObject = this.toObject();
   const { _id, email } = userObject;
@@ -34,6 +49,7 @@ UserSchema.methods.toJSON = function() {
 };
 
 UserSchema.methods.generateAuthToken = function() {
+  // token needs an expiration time
   const access = "auth";
   const token = jwt
     .sign({ _id: this._id.toHexString(), access }, "secret123")
