@@ -9,23 +9,29 @@ const testQuote = {
   year: 2000
 };
 
-const testQuotes = [
-  {
-    text: "test quote 1"
-  },
-  {
-    text: "test quote 2",
-    author: "testAuthor1"
-  },
-  {
-    text: "test quote 3",
-    author: "testAuthor3",
-    year: 2018
-  }
-];
-
 const testUser1Id = ObjectID();
 const testUser2Id = ObjectID();
+
+const testQuotes = [
+  {
+    _id: new ObjectID(),
+    text: "test quote 1",
+    postedBy: testUser1Id,
+  },
+  {
+    _id: new ObjectID(),
+    text: "test quote 2",
+    author: "testAuthor1",
+    postedBy: testUser1Id,
+  },
+  {
+    _id: new ObjectID(),
+    text: "test quote 3",
+    author: "testAuthor3",
+    year: 2018,
+    postedBy: testUser2Id,
+  }
+];
 
 const testUsers = [
   {
@@ -44,7 +50,15 @@ const testUsers = [
   {
     _id: testUser2Id,
     email: "testUser2@email.com",
-    password: "password123"
+    password: "password123",
+    tokens: [
+      {
+        access: "auth",
+        token: jwt
+          .sign({ _id: testUser2Id, access: "auth" }, "secret123")
+          .toString()
+      }
+    ]
   }
 ];
 

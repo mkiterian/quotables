@@ -21,6 +21,7 @@ describe("POST /quotes", () => {
   test("should create a new quote", async () => {
     const response = await request(app)
       .post("/quotes")
+      .set("x-auth", testUsers[0].tokens[0].token)
       .send({ ...testQuote });
     expect(response.statusCode).toBe(201);
     expect(response.body.text).toBe(testQuote.text);
@@ -29,6 +30,7 @@ describe("POST /quotes", () => {
   test("should not create a new quote without text", async () => {
     const response = await request(app)
       .post("/quotes")
+      .set("x-auth", testUsers[0].tokens[0].token)
       .send({ ...testQuote, text: undefined });
     expect(response.statusCode).toBe(400);
   });
@@ -36,46 +38,61 @@ describe("POST /quotes", () => {
 
 describe("GET /quotes", () => {
   test("should get all quotes", async () => {
-    const response = await request(app).get("/quotes");
+    const response = await request(app)
+      .get("/quotes")
+      .set("x-auth", testUsers[0].tokens[0].token);
     expect(response.statusCode).toBe(200);
-    expect(response.body.quotes.length).toBe(testQuotes.length);
+    expect(response.body.quotes.length).toBe(2);
   });
 });
 
 describe("GET /quotes/:id", () => {
   test("should get a quote with a given id", async () => {
-    const allTestQuotes = await request(app).get("/quotes");
-    const id = allTestQuotes.body.quotes[0]._id;
-    const response = await request(app).get(`/quotes/${id}`);
+    const id = testQuotes[0]._id;
+    const response = await request(app)
+      .get(`/quotes/${id}`)
+      .set("x-auth", testUsers[0].tokens[0].token);
     expect(response.statusCode).toBe(200);
     expect(response.body.quote.text).toBe(testQuotes[0].text);
   });
 
   test("should return a 404 if a quote is not found", async () => {
-    const allTestQuotes = await request(app).get("/quotes");
-    let id = allTestQuotes.body.quotes[0]._id;
-    id = id.substring(0, 5);
-    const response = await request(app).get(`/quotes/${id}`);
+    id = "random";
+    const response = await request(app)
+      .get(`/quotes/${id}`)
+      .set("x-auth", testUsers[0].tokens[0].token);
     expect(response.statusCode).toBe(404);
     expect(response.body.message).toBe("not found");
+  });
+
+  test("should not get a quote created by another user", async () => {
+    const id = testQuotes[0]._id;
+    const response = await request(app)
+      .get(`/quotes/${id}`)
+      .set("x-auth", testUsers[1].tokens[0].token);
+    expect(response.statusCode).toBe(404);
   });
 });
 
 describe("DELETE /quotes/:id", () => {
   test("should delete a quote with a given id", async () => {
-    const allTestQuotes = await request(app).get("/quotes");
-    const id = allTestQuotes.body.quotes[0]._id;
-    const response = await request(app).delete(`/quotes/${id}`);
+    const id = testQuotes[0]._id;
+    const response = await request(app)
+      .delete(`/quotes/${id}`)
+      .set("x-auth", testUsers[0].tokens[0].token);
     expect(response.statusCode).toBe(200);
     expect(response.body.quote.text).toBe(testQuotes[0].text);
-    const newResponse = await request(app).get("/quotes");
-    expect(newResponse.body.quotes.length).toBe(testQuotes.length - 1);
+    const newResponse = await request(app)
+      .get("/quotes")
+      .set("x-auth", testUsers[0].tokens[0].token);
+    expect(newResponse.body.quotes.length).toBe(1);
   });
 
   test("should return a 404 if id is not found", async () => {
-    const allTestQuotes = await request(app).get("/quotes");
     const id = "123";
-    const response = await request(app).delete(`/quotes/${id}`);
+    const response = await request(app)
+      .delete(`/quotes/${id}`)
+      .set("x-auth", testUsers[0].tokens[0].token);
     expect(response.statusCode).toBe(404);
     expect(response.body.message).toBe("not found");
   });
@@ -84,10 +101,10 @@ describe("DELETE /quotes/:id", () => {
 describe("PATCH /quotes/:id", () => {
   test("should update a quote with a given id", async () => {
     const updateText = "This is an update";
-    const allTestQuotes = await request(app).get("/quotes");
-    const id = allTestQuotes.body.quotes[0]._id;
+    const id = testQuotes[0]._id;
     const response = await request(app)
       .patch(`/quotes/${id}`)
+      .set("x-auth", testUsers[0].tokens[0].token)
       .send({
         text: updateText
       });
@@ -97,7 +114,9 @@ describe("PATCH /quotes/:id", () => {
 
   test("should return a 404 if id is not found", async () => {
     const id = "123";
-    const response = await request(app).patch(`/quotes/${id}`);
+    const response = await request(app)
+      .patch(`/quotes/${id}`)
+      .set("x-auth", testUsers[0].tokens[0].token);
     expect(response.statusCode).toBe(404);
     expect(response.body.message).toBe("not found");
   });

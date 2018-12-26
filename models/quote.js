@@ -15,6 +15,10 @@ const Quote = mongoose.model("Quote", {
   },
   year: {
     type: Number
+  },
+  postedBy: {
+    type: mongoose.Types.ObjectId,
+    required: true,
   }
 });
 

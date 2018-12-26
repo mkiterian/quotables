@@ -1,0 +1,12 @@
+{
+  "test": {
+    "PORT": 3000,
+    "MONGO_URI": "mongodb://localhost:27017/quotablesTest",
+    "JWT_SECRET": "secret123"
+  },
+  "development": {
+    "PORT": 3000,
+    "MONGO_URI": "mongodb://localhost:27017/quotables",
+    "JWT_SECRET": "as89as9as89wsdsd444"
+  }
+}

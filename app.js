@@ -10,12 +10,13 @@ const { authenticate } = require("./middleware/auth");
 const app = express();
 app.use(bodyParser.json());
 
-app.post("/quotes", (req, res) => {
+app.post("/quotes", authenticate, (req, res) => {
   const { author, text, year } = req.body;
   const newQuote = new Quote({
     author,
     text,
-    year
+    year,
+    postedBy: req.user._id
   });
 
   newQuote.save().then(
@@ -28,8 +29,8 @@ app.post("/quotes", (req, res) => {
   );
 });
 
-app.get("/quotes", (req, res) => {
-  Quote.find().then(
+app.get("/quotes", authenticate, (req, res) => {
+  Quote.find({ postedBy: req.user._id }).then(
     quotes => {
       return res.send({ quotes });
     },
@@ -39,14 +40,14 @@ app.get("/quotes", (req, res) => {
   );
 });
 
-app.get("/quotes/:id", (req, res) => {
+app.get("/quotes/:id", authenticate, (req, res) => {
   const id = req.params.id;
   if (!ObjectID.isValid(id)) {
     return res.status(404).send({
       message: "not found"
     });
   }
-  Quote.findById(id).then(
+  Quote.findOne({ _id: id, postedBy: req.user._id }).then(
     quote => {
       if (!quote) {
         return res.status(404).send({
@@ -61,14 +62,14 @@ app.get("/quotes/:id", (req, res) => {
   );
 });
 
-app.delete("/quotes/:id", (req, res) => {
+app.delete("/quotes/:id", authenticate, (req, res) => {
   const id = req.params.id;
   if (!ObjectID.isValid(id)) {
     return res.status(404).send({
       message: "not found"
     });
   }
-  Quote.findByIdAndDelete(id).then(
+  Quote.findOneAndDelete({ _id: id, postedBy: req.user._id }).then(
     quote => {
       if (!quote) {
         return res.status(404).send({
@@ -83,7 +84,7 @@ app.delete("/quotes/:id", (req, res) => {
   );
 });
 
-app.patch("/quotes/:id", (req, res) => {
+app.patch("/quotes/:id", authenticate, (req, res) => {
   const id = req.params.id;
   if (!ObjectID.isValid(id)) {
     return res.status(404).send({
@@ -92,8 +93,8 @@ app.patch("/quotes/:id", (req, res) => {
   }
   const { text, author, year } = req.body;
 
-  Quote.findByIdAndUpdate(
-    id,
+  Quote.findOneAndUpdate(
+    {_id: id, postedBy:req.user._id},
     {
       $set: {
         author,
