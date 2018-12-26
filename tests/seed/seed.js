@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 
 const { Quote } = require("../../models/quote");
 const { User } = require("../../models/user");
+const jwtSecret = process.env.JWT_SECRET;
 
 const testQuote = {
   text: "This is a test quote",
@@ -42,7 +43,7 @@ const testUsers = [
       {
         access: "auth",
         token: jwt
-          .sign({ _id: testUser1Id, access: "auth" }, "secret123")
+          .sign({ _id: testUser1Id, access: "auth" }, jwtSecret)
           .toString()
       }
     ]
@@ -55,7 +56,7 @@ const testUsers = [
       {
         access: "auth",
         token: jwt
-          .sign({ _id: testUser2Id, access: "auth" }, "secret123")
+          .sign({ _id: testUser2Id, access: "auth" }, jwtSecret)
           .toString()
       }
     ]

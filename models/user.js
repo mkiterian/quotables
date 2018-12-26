@@ -2,6 +2,8 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+require("../config/config");
+const jwtSecret = process.env.JWT_SECRET;
 
 const UserSchema = new mongoose.Schema({
   email: {
@@ -31,7 +33,7 @@ const UserSchema = new mongoose.Schema({
 UserSchema.statics.findByToken = function(token) {
   let decoded = null;
   try {
-    decoded = jwt.verify(token, "secret123");
+    decoded = jwt.verify(token, jwtSecret);
   } catch (err) {
     return Promise.reject();
   }
@@ -83,7 +85,7 @@ UserSchema.methods.generateAuthToken = function() {
   // token needs an expiration time
   const access = "auth";
   const token = jwt
-    .sign({ _id: this._id.toHexString(), access }, "secret123")
+    .sign({ _id: this._id.toHexString(), access }, jwtSecret)
     .toString();
   this.tokens.push({ access, token });
   return this.save().then(() => token);
