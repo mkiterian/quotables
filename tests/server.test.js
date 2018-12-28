@@ -122,22 +122,6 @@ describe("PATCH /quotes/:id", () => {
   });
 });
 
-describe("GET /users/me", () => {
-  it("should return a user if authenticated", async () => {
-    const response = await request(app)
-      .get("/users/me")
-      .set("x-auth", testUsers[0].tokens[0].token);
-    expect(response.statusCode).toBe(200);
-    expect(response.body.user.email).toBe(testUsers[0].email);
-    expect(response.body.user._id).toBe(testUsers[0]._id.toString());
-  });
-
-  it("should return a 401 if not authenticated", async () => {
-    const response = await request(app).get("/users/me");
-    expect(response.statusCode).toBe(401);
-  });
-});
-
 describe("POST /users", () => {
   it("shoud create a user", async () => {
     const email = "qwerty@email.com";
