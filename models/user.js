@@ -85,7 +85,9 @@ UserSchema.methods.generateAuthToken = function() {
   // token needs an expiration time
   const access = "auth";
   const token = jwt
-    .sign({ _id: this._id.toHexString(), access }, jwtSecret)
+    .sign({ _id: this._id.toHexString(), access }, jwtSecret, {
+      expiresIn: 60 * 60 * 24
+    })
     .toString();
   this.tokens.push({ access, token });
   return this.save().then(() => token);
