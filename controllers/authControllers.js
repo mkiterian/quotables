@@ -1,7 +1,6 @@
-const mongoose = require("../db/mongoose");
 const { User } = require("../models/user");
 
-const createUser = (req, res) => {
+const register = (req, res) => {
   const { email, password } = req.body;
   const newUser = new User({ email, password });
   newUser
@@ -41,7 +40,7 @@ const logout = (req, res) => {
 };
 
 module.exports = {
-  createUser,
+  register,
   login,
   logout,
 };

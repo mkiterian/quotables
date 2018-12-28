@@ -1,8 +1,7 @@
-const mongoose = require("../db/mongoose");
 const { ObjectID } = require("mongodb");
 const { Quote } = require("../models/quote");
 
-const createQuote = (req, res) => {
+const createOne = (req, res) => {
   const { author, text, year } = req.body;
   const newQuote = new Quote({
     author,
@@ -21,7 +20,7 @@ const createQuote = (req, res) => {
   );
 };
 
-const readQuotes = (req, res) => {
+const getAll = (req, res) => {
   Quote.find({ postedBy: req.user._id }).then(
     quotes => {
       return res.send({ quotes });
@@ -32,7 +31,7 @@ const readQuotes = (req, res) => {
   );
 };
 
-const readQuote = (req, res) => {
+const getOne = (req, res) => {
   const id = req.params.id;
   if (!ObjectID.isValid(id)) {
     return res.status(404).send({
@@ -54,7 +53,7 @@ const readQuote = (req, res) => {
   );
 };
 
-updateQuote = (req, res) => {
+updateOne = (req, res) => {
   const id = req.params.id;
   if (!ObjectID.isValid(id)) {
     return res.status(404).send({
@@ -80,7 +79,7 @@ updateQuote = (req, res) => {
     .catch(err => res.status(400).send());
 };
 
-deleteQuote = (req, res) => {
+deleteOne = (req, res) => {
   const id = req.params.id;
   if (!ObjectID.isValid(id)) {
     return res.status(404).send({
@@ -103,9 +102,9 @@ deleteQuote = (req, res) => {
 };
 
 module.exports = {
-  createQuote,
-  readQuotes,
-  readQuote,
-  updateQuote,
-  deleteQuote
+  createOne,
+  getAll,
+  getOne,
+  updateOne,
+  deleteOne
 };
