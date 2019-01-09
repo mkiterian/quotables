@@ -7,7 +7,8 @@
     "test": "export NODE_ENV=test && jest",
     "start": "node server.js",
     "start-watch": "nodemon server.js",
-    "coverage": "jest --coverage"
+    "coverage": "jest --coverage",
+    "coverage-report": "jest --coverage --coverageReporters=text-lcov | coveralls"
   },
   "engines": {
     "node": "v10.9.0"
