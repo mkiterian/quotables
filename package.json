@@ -1,12 +1,13 @@
 {
-  "name": "testament",
+  "name": "quotables",
   "version": "1.0.0",
   "description": "",
   "main": "server.js",
   "scripts": {
     "test": "export NODE_ENV=test && jest",
     "start": "node server.js",
-    "start-watch": "nodemon server.js"
+    "start-watch": "nodemon server.js",
+    "coverage": "jest --coverage"
   },
   "engines": {
     "node": "v10.9.0"
@@ -23,6 +24,7 @@
     "validator": "^10.10.0"
   },
   "devDependencies": {
+    "coveralls": "^3.0.2",
     "jest": "^23.6.0",
     "nodemon": "^1.18.9",
     "supertest": "^3.3.0"
