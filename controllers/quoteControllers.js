@@ -33,11 +33,6 @@ const getAll = (req, res) => {
 
 const getOne = (req, res) => {
   const id = req.params.id;
-  if (!ObjectID.isValid(id)) {
-    return res.status(404).send({
-      message: "not found"
-    });
-  }
   Quote.findOne({ _id: id, postedBy: req.user._id }).then(
     quote => {
       if (!quote) {
@@ -55,11 +50,6 @@ const getOne = (req, res) => {
 
 updateOne = (req, res) => {
   const id = req.params.id;
-  if (!ObjectID.isValid(id)) {
-    return res.status(404).send({
-      message: "not found"
-    });
-  }
   const { text, author, year } = req.body;
 
   Quote.findOneAndUpdate(
@@ -81,11 +71,6 @@ updateOne = (req, res) => {
 
 deleteOne = (req, res) => {
   const id = req.params.id;
-  if (!ObjectID.isValid(id)) {
-    return res.status(404).send({
-      message: "not found"
-    });
-  }
   Quote.findOneAndDelete({ _id: id, postedBy: req.user._id }).then(
     quote => {
       if (!quote) {
