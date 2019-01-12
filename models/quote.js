@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const Quote = mongoose.model("Quote", {
+const quoteSchema = new mongoose.Schema({
   text: {
     type: String,
     required: true,
@@ -18,8 +18,10 @@ const Quote = mongoose.model("Quote", {
   },
   postedBy: {
     type: mongoose.Types.ObjectId,
-    required: true,
+    required: true
   }
 });
+
+const Quote = mongoose.model("Quote", quoteSchema);
 
 module.exports = { Quote };
