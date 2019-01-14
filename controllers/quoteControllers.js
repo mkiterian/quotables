@@ -1,7 +1,7 @@
 const { ObjectID } = require("mongodb");
 const { Quote } = require("../models/quote");
 
-const createOne = (req, res) => {
+const createOne = async (req, res) => {
   const { author, text, year } = req.body;
   const newQuote = new Quote({
     author,
@@ -10,80 +10,71 @@ const createOne = (req, res) => {
     postedBy: req.user._id
   });
 
-  newQuote.save().then(
-    quote => {
-      return res.status(201).send(quote);
-    },
-    err => {
-      return res.status(400).send(err);
-    }
-  );
+  try {
+    const quote = await newQuote.save();
+    res.status(201).json(quote);
+  } catch (e) {
+    res.status(400).json({ error: e.message });
+  }
 };
 
-const getAll = (req, res) => {
-  Quote.find({ postedBy: req.user._id }).then(
-    quotes => {
-      return res.send({ quotes });
-    },
-    err => {
-      return res.status(400).send(err);
-    }
-  );
+const getAll = async (req, res) => {
+  try {
+    const quotes = await Quote.find({ postedBy: req.user._id }).exec();
+    res.status(200).json({ quotes });
+  } catch (e) {
+    res.status(400).json({ error: e.message });
+  }
 };
 
-const getOne = (req, res) => {
+const getOne = async (req, res) => {
   const id = req.params.id;
-  Quote.findOne({ _id: id, postedBy: req.user._id }).then(
-    quote => {
-      if (!quote) {
-        return res.status(404).send({
-          message: "not found"
-        });
-      }
-      return res.send({ quote });
-    },
-    err => {
-      return res.status(404).send({});
-    }
-  );
+  try {
+    const quote = await Quote.findOne({
+      _id: id,
+      postedBy: req.user._id
+    }).exec();
+    if (!quote) throw new Error("not found");
+    res.status(200).json({ quote });
+  } catch (e) {
+    res.status(404).json({ message: e.message });
+  }
 };
 
-updateOne = (req, res) => {
+updateOne = async (req, res) => {
   const id = req.params.id;
   const { text, author, year } = req.body;
 
-  Quote.findOneAndUpdate(
-    { _id: id, postedBy: req.user._id },
-    {
-      $set: {
-        author,
-        text,
-        year
-      }
-    },
-    { new: true }
-  )
-    .then(quote => {
-      return res.send({ quote });
-    })
-    .catch(err => res.status(400).send());
+  try {
+    const quote = await Quote.findOneAndUpdate(
+      { _id: id, postedBy: req.user._id },
+      {
+        $set: {
+          author,
+          text,
+          year
+        }
+      },
+      { new: true }
+    ).exec();
+    if (!quote) throw new Error("not found");
+    res.status(200).json({ quote });
+  } catch (e) {
+    res.status(404).json({ message: e.message });
+  }
 };
 
-deleteOne = (req, res) => {
+deleteOne = async (req, res) => {
   const id = req.params.id;
-  Quote.findOneAndDelete({ _id: id, postedBy: req.user._id }).then(
-    quote => {
-      if (!quote) {
-        return res.status(404).send({
-          message: "not found"
-        });
-      }
-      return res.send({ quote });
-    },
-    err => {
-      return res.status(404).send({});
-    }
-  );
+  try {
+    const quote = await Quote.findOneAndDelete({
+      _id: id,
+      postedBy: req.user._id
+    }).exec();
+    res.status(200).json({ quote });
+  } catch (e) {
+    res.status(400).json({ error: e.message });
+  }
 };
 
 module.exports = {
