@@ -170,8 +170,9 @@ describe("POST /users/login", () => {
         email: testUsers[0].email,
         password: "wrong"
       });
-    expect(response.statusCode).toBe(400);
-    expect(response.headers["x-auth"]).toBeFalsy();
+    expect(response.statusCode).toBe(500);
+    expect(response.body.message).toBe("there was an error logging in");
+    expect(response.headers["x-auth"]).toBeUndefined();
   });
 });
 

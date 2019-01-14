@@ -1,33 +1,30 @@
 const { User } = require("../models/user");
 
-const register = (req, res) => {
-  const { email, password } = req.body;
-  const newUser = new User({ email, password });
-  newUser
-    .save()
-    .then(user => {
-      return user.generateAuthToken();
-    })
-    .then(token => {
-      res.header("x-auth", token).send(newUser);
-    })
-    .catch(err => {
-      res.status(400).send({ error: err });
-    });
+const register = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const newUser = new User({ email, password });
+    const user = await newUser.save();
+    const token = await user.generateAuthToken();
+    res.header("x-auth", token).send(newUser);
+  } catch (e) {
+    res.status(400).send({ error: e.message });
+  }
 };
 
-const login = (req, res) => {
+const login = async (req, res) => {
   const { email, password } = req.body;
-  User.findByCredentials(email, password)
-    .then(user => {
-      if (user.tokens[0].token) {
-        return res.header("x-auth", user.tokens[0].token).send({ user });
-      }
-      user.generateAuthToken().then(token => {
-        res.header("x-auth", token).send({ user });
-      });
-    })
-    .catch(err => res.status(400).send());
+  try {
+    const user = await User.findByCredentials(email, password);
+    if (user.tokens[0].token) {
+      return res.header("x-auth", user.tokens[0].token).send({ user });
+    }
+    user.generateAuthToken().then(token => {
+      res.header("x-auth", token).send({ user });
+    });
+  } catch (e) {
+    res.status(500).json({ message: "there was an error logging in" });
+  }
 };
 
 const logout = (req, res) => {
@@ -42,5 +39,5 @@ const logout = (req, res) => {
 module.exports = {
   register,
   login,
-  logout,
+  logout
 };

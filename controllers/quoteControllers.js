@@ -23,7 +23,7 @@ const getAll = async (req, res) => {
     const quotes = await Quote.find({ postedBy: req.user._id }).exec();
     res.status(200).json({ quotes });
   } catch (e) {
-    res.status(400).json({ error: e.message });
+    res.status(500).json({ error: "error occurred while retrieving the quotes" });
   }
 };
 
