@@ -29,7 +29,7 @@ const login = async (req, res) => {
   // sanitize and validate user input
   try {
     const user = await User.findByCredentials(email, password);
-    if (user.tokens[0].token) {
+    if (user.tokens[0] && user.tokens[0].token) {
       return res.header("x-auth", user.tokens[0].token).send({ user });
     }
     user.generateAuthToken().then(token => {
@@ -44,9 +44,9 @@ const logout = (req, res) => {
   req.user
     .deleteToken(req.token)
     .then(() => {
-      res.status(200).send();
+      res.status(200).json({ message: "Successfully logged out" });
     })
-    .catch(err => res.status.send(400));
+    .catch(err => res.status(500).json({ message: "Failed to logout" }));
 };
 
 module.exports = {

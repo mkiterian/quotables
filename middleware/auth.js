@@ -6,7 +6,7 @@ const authenticate = (req, res, next) => {
   User.findByToken(token)
     .then(user => {
       if (!user) {
-        return Promise.reject();
+        return Promise.reject(new Error("Please login"));
       }
 
       req.user = user;
@@ -14,7 +14,7 @@ const authenticate = (req, res, next) => {
       next();
     })
     .catch(err => {
-      res.status(401).send();
+      res.status(401).json({ message: err.message });
     });
 };
 

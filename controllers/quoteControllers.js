@@ -3,6 +3,7 @@ const { Quote } = require("../models/quote");
 
 const createOne = async (req, res) => {
   const { author, text, year } = req.body;
+  // sanitize and validate input
   const newQuote = new Quote({
     author,
     text,
@@ -12,7 +13,7 @@ const createOne = async (req, res) => {
 
   try {
     const quote = await newQuote.save();
-    res.status(201).json(quote);
+    res.status(201).json({ quote });
   } catch (e) {
     res.status(400).json({ error: e.message });
   }

@@ -24,7 +24,7 @@ describe("POST /quotes", () => {
       .set("x-auth", testUsers[0].tokens[0].token)
       .send({ ...testQuote });
     expect(response.statusCode).toBe(201);
-    expect(response.body.text).toBe(testQuote.text);
+    expect(response.body.quote.text).toBe(testQuote.text);
   });
 
   test("should not create a new quote without text", async () => {
@@ -195,7 +195,17 @@ describe("DELETE /users/logout", () => {
       .delete("/users/logout")
       .set("x-auth", testUsers[0].tokens[0].token);
     expect(response.statusCode).toBe(200);
+    expect(response.body.message).toBe("Successfully logged out");
     const result = await User.findById(testUsers[0]);
     expect(result.tokens.length).toBe(0);
+
+    const loginResponse = await request(app)
+      .post("/users/login")
+      .send({
+        email: testUsers[0].email,
+        password: testUsers[0].password
+      });
+    expect(loginResponse.headers["x-auth"]).toBeTruthy();
+    expect(loginResponse.body.user.email).toBe(testUsers[0].email);
   });
 });
