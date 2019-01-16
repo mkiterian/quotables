@@ -35,7 +35,7 @@ UserSchema.statics.findByToken = function(token) {
   try {
     decoded = jwt.verify(token, jwtSecret);
   } catch (err) {
-    return Promise.reject();
+    return Promise.reject(new Error("Please login to continue"));
   }
 
   return this.findOne({

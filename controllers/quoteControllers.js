@@ -21,10 +21,12 @@ const createOne = async (req, res) => {
 
 const getAll = async (req, res) => {
   try {
-    const quotes = await Quote.find({ postedBy: req.user._id }).exec();
+    const quotes = await Quote.find({}).exec();
     res.status(200).json({ quotes });
   } catch (e) {
-    res.status(500).json({ error: "error occurred while retrieving the quotes" });
+    res
+      .status(500)
+      .json({ error: "error occurred while retrieving the quotes" });
   }
 };
 
@@ -72,6 +74,7 @@ deleteOne = async (req, res) => {
       _id: id,
       postedBy: req.user._id
     }).exec();
+    if (!quote) throw new Error("not found");
     res.status(200).json({ quote });
   } catch (e) {
     res.status(400).json({ error: e.message });

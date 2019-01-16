@@ -42,7 +42,7 @@ describe("GET /quotes", () => {
       .get("/quotes")
       .set("x-auth", testUsers[0].tokens[0].token);
     expect(response.statusCode).toBe(200);
-    expect(response.body.quotes.length).toBe(2);
+    expect(response.body.quotes.length).toBe(3);
   });
 });
 
@@ -82,10 +82,6 @@ describe("DELETE /quotes/:id", () => {
       .set("x-auth", testUsers[0].tokens[0].token);
     expect(response.statusCode).toBe(200);
     expect(response.body.quote.text).toBe(testQuotes[0].text);
-    const newResponse = await request(app)
-      .get("/quotes")
-      .set("x-auth", testUsers[0].tokens[0].token);
-    expect(newResponse.body.quotes.length).toBe(1);
   });
 
   test("should return a 404 if id is not found", async () => {
