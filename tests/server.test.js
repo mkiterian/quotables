@@ -133,6 +133,7 @@ describe("POST /users", () => {
     expect(response.body.email).toBe(email);
     expect(response.headers["x-auth"]).not.toBeUndefined();
   });
+
   it("should return validation errors if request is invalid", async () => {
     const email = "email.com";
     const password = "qwertyuiop";
@@ -140,7 +141,19 @@ describe("POST /users", () => {
       .post("/users")
       .send({ email, password });
     expect(response.statusCode).toBe(400);
+    expect(response.body.errors.email).toBe(`${email} is not a valid email address`);
   });
+
+  it("should return correct error if email is already taken", async () => {
+    const email = testUsers[0].email;
+    const password = "qwertyuiop";
+    const response = await request(app)
+      .post("/users")
+      .send({ email, password });
+    expect(response.body.message).toBe("Email address already in use");
+    expect(response.statusCode).toBe(400);
+  });
+
   it("should not create user if the email is in use", async () => {
     const email = testUsers[0].email;
     const password = "qwertyuiop";
