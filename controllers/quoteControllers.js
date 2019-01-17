@@ -33,6 +33,19 @@ const getAll = async (req, res) => {
   }
 };
 
+const deleteQuote = async (req, res) => {
+  let query = queryBuilder(req);
+  query = { ...query}
+  const queries = Object.keys(query);
+  if(!queries.length) return res.status(400).json({message: "Not allowed"});
+  try{
+    const quotes = await Quote.deleteMany({ ...query}).exec();
+    res.status(200).send(quotes);
+  }catch(err){
+    console.log(err);
+  }
+}
+
 const getOne = async (req, res) => {
   const id = req.params.id;
   try {

@@ -11,6 +11,7 @@ router.delete("/users/logout", authenticate, authControllers.logout);
 
 router.post("/quotes", authenticate, quoteControllers.createOne);
 router.get("/quotes", authenticate, quoteControllers.getAll);
+router.delete("/quotes", authenticate, quoteControllers.deleteQuote);
 router.get(
   "/quotes/:id",
   authenticate,
