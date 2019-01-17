@@ -44,6 +44,15 @@ describe("GET /quotes", () => {
     expect(response.statusCode).toBe(200);
     expect(response.body.quotes.length).toBe(3);
   });
+
+  test("should search for a quote and return it", async () => {
+    const response = await request(app)
+      .get("/quotes?search=found")
+      .set("x-auth", testUsers[0].tokens[0].token);
+    expect(response.statusCode).toBe(200);
+    expect(response.body.quotes.length).toBe(1);
+    expect(response.body.quotes[0].text).toContain("found");
+  });
 });
 
 describe("GET /quotes/:id", () => {
@@ -137,7 +146,9 @@ describe("POST /users", () => {
       .post("/users")
       .send({ email, password });
     expect(response.statusCode).toBe(400);
-    expect(response.body.errors.email).toBe(`${email} is not a valid email address`);
+    expect(response.body.errors.email).toBe(
+      `${email} is not a valid email address`
+    );
   });
 
   it("should return correct error if email is already taken", async () => {

@@ -27,7 +27,7 @@ const testQuotes = [
   },
   {
     _id: new ObjectID(),
-    text: "test quote 3",
+    text: "test quote 3 found",
     author: "testAuthor3",
     year: 2018,
     postedBy: testUser2Id,
