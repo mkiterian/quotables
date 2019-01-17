@@ -22,7 +22,13 @@ const createOne = async (req, res) => {
 };
 
 const getAll = async (req, res) => {
-  const query = queryBuilder(req);
+  let query = {};
+  if(req.query.search){
+    query = { $text: { $search: req.query.search } };
+  } else {
+    query = queryBuilder(req);
+  }
+
   try {
     const quotes = await Quote.find(query).exec();
     res.status(200).json({ quotes });
