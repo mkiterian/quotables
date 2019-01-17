@@ -1,5 +1,7 @@
 const { ObjectID } = require("mongodb");
 const { Quote } = require("../models/quote");
+const getLongestWord = require("../utils/getLongestWord");
+const queryBuilder = require("../utils/queryBuilder");
 
 const createOne = async (req, res) => {
   const { author, text, year } = req.body;
@@ -20,8 +22,9 @@ const createOne = async (req, res) => {
 };
 
 const getAll = async (req, res) => {
+  const query = queryBuilder(req);
   try {
-    const quotes = await Quote.find({}).exec();
+    const quotes = await Quote.find(query).exec();
     res.status(200).json({ quotes });
   } catch (e) {
     res
@@ -37,8 +40,9 @@ const getOne = async (req, res) => {
       _id: id,
       postedBy: req.user._id
     }).exec();
+    const longestWord = getLongestWord(quote.text);
     if (!quote) throw new Error("not found");
-    res.status(200).json({ quote });
+    res.status(200).json({ quote, longestWord, longestWordLength: longestWord.length  });
   } catch (e) {
     res.status(404).json({ message: e.message });
   }
@@ -86,5 +90,6 @@ module.exports = {
   getAll,
   getOne,
   updateOne,
-  deleteOne
+  deleteOne,
+  deleteQuote,
 };
