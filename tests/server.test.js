@@ -242,4 +242,12 @@ describe("DELETE /quotes", () => {
     expect(response.statusCode).toBe(200);
     expect(response.body.message).toBe("Quotes deleted successfully");
   });
+
+  it("should not delete quotes if no query values are provided", async () => {
+    const response = await request(app)
+      .delete("/quotes")
+      .set("x-auth", testUsers[0].tokens[0].token);
+    expect(response.statusCode).toBe(400);
+    expect(response.body.message).toBe("Not allowed");
+  });
 });
