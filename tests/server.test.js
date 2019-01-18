@@ -53,6 +53,22 @@ describe("GET /quotes", () => {
     expect(response.body.quotes.length).toBe(1);
     expect(response.body.quotes[0].text).toContain("found");
   });
+
+  test("should find quotes by year", async () => {
+    const response = await request(app)
+      .get("/quotes?year=2018")
+      .set("x-auth", testUsers[0].tokens[0].token);
+    expect(response.statusCode).toBe(200);
+    expect(response.body.quotes.length).toBe(1);
+  });
+
+  test("should find quotes by postedBy", async () => {
+    const response = await request(app)
+      .get(`/quotes?username=${testUsers[0]._id}`)
+      .set("x-auth", testUsers[0].tokens[0].token);
+    expect(response.statusCode).toBe(200);
+    expect(response.body.quotes.length).toBe(2);
+  });
 });
 
 describe("GET /quotes/:id", () => {
@@ -214,5 +230,16 @@ describe("DELETE /users/logout", () => {
       });
     expect(loginResponse.headers["x-auth"]).toBeTruthy();
     expect(loginResponse.body.user.email).toBe(testUsers[0].email);
+  });
+});
+
+describe("DELETE /quotes", () => {
+  it("should delete quote given query filters successfully", async () => {
+    const response = await request(app)
+      .delete(`/quotes?author=${testQuotes[0].author}`)
+      .set("x-auth", testUsers[0].tokens[0].token);
+    console.log(response.body);
+    expect(response.statusCode).toBe(200);
+    expect(response.body.message).toBe("Quotes deleted successfully");
   });
 });
