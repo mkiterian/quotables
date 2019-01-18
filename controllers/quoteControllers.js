@@ -45,7 +45,7 @@ const deleteQuote = async (req, res) => {
   const queries = Object.keys(query);
   if(!queries.length) return res.status(400).json({message: "Not allowed"});
   try{
-    const quotes = await Quote.deleteMany({ ...query}).exec();
+    const quotes = await Quote.deleteMany({ ...query, postedBy: req.user._id}).exec();
     res.status(200).send({ message: "Quotes deleted successfully" });
   }catch(err){
     console.log(err);
